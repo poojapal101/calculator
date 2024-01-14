@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Calculator</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: slategrey;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #calculator {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 300px;
+            width: 100%;
+        }
+
+        #display {
+            padding: 15px;
+            text-align: right;
+            font-size: 1.5em;
+            border-bottom: 1px solid #ccc;
+        }
+
+        #buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+        }
+
+        button {
+            padding: 15px;
+            font-size: 1.2em;
+            border: 0;
+            outline: none;
+            cursor: pointer;
+            background-color: #eee;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #ddd;
+        }
+
+        button.operator {
+            background-color: #f7941e;
+            color: #fff;
+        }
+
+        button.operator:hover {
+            background-color: #e08317;
+        }
+
+        button.clear, button.delete {
+            background-color: #ccc;
+        }
+
+        button.clear:hover, button.delete:hover {
+            background-color: #bbb;
+        }
+    </style>
+</head>
+<body>
+    <div id="calculator">
+        <div id="display"></div>
+        <div id="buttons">
+            <button>7</button>
+            <button>8</button>
+            <button>9</button>
+            <button class="operator">/</button>
+
+            <button>4</button>
+            <button>5</button>
+            <button>6</button>
+            <button class="operator">*</button>
+
+            <button>1</button>
+            <button>2</button>
+            <button>3</button>
+            <button class="operator">-</button>
+
+            <button>0</button>
+            <button>.</button>
+            <button class="delete">DEL</button>
+            <button class="operator">+</button>
+
+            <button class="clear">C</button>
+            <button class="operator">=</button>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const display = document.getElementById("display");
+            const buttons = document.getElementById("buttons");
+
+            let currentInput = '';
+            let currentOperator = '';
+            let firstOperand = null;
+
+            function updateDisplay() {
+                display.textContent = currentInput || '0';
+            }
+
+            buttons.addEventListener("click", function (event) {
+                const target = event.target;
+
+                if (target.tagName === 'BUTTON') {
+                    const buttonValue = target.textContent;
+
+                    if (!isNaN(buttonValue) || buttonValue === '.') {
+                        currentInput += buttonValue;
+                    } else if (buttonValue === '+' || buttonValue === '-' || buttonValue === '*' || buttonValue === '/') {
+                        if (currentInput !== '') {
+                            if (firstOperand === null) {
+                                firstOperand = parseFloat(currentInput);
+                                currentOperator = buttonValue;
+                                currentInput = '';
+                            } else {
+                                currentInput = evaluateExpression().toString();
+                                firstOperand = parseFloat(currentInput);
+                                currentOperator = buttonValue;
+                                currentInput = '';
+                            }
+                        }
+                    } else if (buttonValue === '=') {
+                        if (currentInput !== '') {
+                            currentInput = evaluateExpression().toString();
+                            firstOperand = null;
+                            currentOperator = '';
+                        }
+                    } else if (buttonValue === 'C') {
+                        currentInput = '';
+                        firstOperand = null;
+                        currentOperator = '';
+                    } else if (buttonValue === 'DEL') {
+                        currentInput = currentInput.slice(0, -1);
+                    }
+
+                    updateDisplay();
+                }
+            });
+
+            function evaluateExpression() {
+                const secondOperand = parseFloat(currentInput);
+                switch (currentOperator) {
+                    case '+':
+                        return firstOperand + secondOperand;
+                    case '-':
+                        return firstOperand - secondOperand;
+                    case '*':
+                        return firstOperand * secondOperand;
+                    case '/':
+                        return firstOperand / secondOperand;
+                    default:
+                        return secondOperand;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
